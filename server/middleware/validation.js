@@ -1,39 +1,45 @@
-import Joi from 'joi';
-import logger from '../config/logger.js';
+import z from 'zod';
 
-export const validateRequest = (schema) => {
+const createValidationMiddleware = (schema) => {
   return (req, res, next) => {
-    const { error, value } = schema.validate(req.body);
-    
-    if (error) {
-      logger.warn('Validation error:', error.details);
-      return res.status(400).json({
-        error: {
-          message: 'Validation Error',
-          details: error.details.map(d => ({
-            field: d.path.join('.'),
-            message: d.message
-          }))
-        }
-      });
+    try {
+      const validatedBody = schema.parse(req.body);
+      req.validatedBody = validatedBody;
+      next();
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          error: {
+            message: 'Validation error',
+            details: error.errors
+          }
+        });
+      }
+      next(error);
     }
-    
-    req.validatedBody = value;
-    next();
   };
 };
 
 export const schemas = {
-  chat: Joi.object({
-    conversationId: Joi.string().optional(),
-    message: Joi.string().required().min(1).max(5000),
-    context: Joi.object().optional()
+  chat: z.object({
+    message: z.string().min(1).max(5000),
+    conversationId: z.string().optional(),
+    context: z.object({}).optional()
   }),
-  
-  note: Joi.object({
-    title: Joi.string().required().min(1).max(200),
-    content: Joi.string().required().min(1),
-    tags: Joi.array().items(Joi.string()).optional(),
-    category: Joi.string().optional()
+
+  note: z.object({
+    title: z.string().min(1).max(200),
+    content: z.string().min(1).max(50000),
+    tags: z.array(z.string()).optional(),
+    category: z.string().optional()
+  }),
+
+  task: z.object({
+    title: z.string().min(1).max(200),
+    description: z.string().max(5000).optional(),
+    type: z.string().optional(),
+    priority: z.enum(['low', 'medium', 'high']).optional()
   })
 };
+
+export const validateRequest = (schema) => createValidationMiddleware(schema);

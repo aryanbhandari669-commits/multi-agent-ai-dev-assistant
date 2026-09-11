@@ -1,67 +1,61 @@
-import { getRedisClient } from '../config/redis.js';
+import redis from 'redis';
+import config from '../config/config.js';
 import logger from '../config/logger.js';
 
 class CacheService {
+  constructor() {
+    this.client = redis.createClient({ url: config.redisUrl });
+    this.client.on('error', (err) => logger.error('Redis error:', err));
+    this.client.connect().catch((err) => logger.error('Redis connect error:', err));
+    this.ttl = config.cache.ttl;
+  }
+
   async get(key) {
     try {
-      const client = getRedisClient();
-      const value = await client.get(key);
-      if (value) {
-        logger.debug(`Cache HIT: ${key}`);
-        return JSON.parse(value);
-      }
-      logger.debug(`Cache MISS: ${key}`);
-      return null;
+      const value = await this.client.get(key);
+      return value ? JSON.parse(value) : null;
     } catch (error) {
-      logger.warn('Cache get error:', error.message);
+      logger.error('Cache get error:', error.message);
       return null;
     }
   }
 
-  async set(key, value, ttl = 3600) {
+  async set(key, value, ttl = this.ttl) {
     try {
-      const client = getRedisClient();
-      await client.setEx(key, ttl, JSON.stringify(value));
-      logger.debug(`Cache SET: ${key} (TTL: ${ttl}s)`);
+      await this.client.setEx(key, ttl, JSON.stringify(value));
+      return true;
     } catch (error) {
-      logger.warn('Cache set error:', error.message);
+      logger.error('Cache set error:', error.message);
+      return false;
     }
   }
 
   async delete(key) {
     try {
-      const client = getRedisClient();
-      await client.del(key);
-      logger.debug(`Cache DELETE: ${key}`);
+      await this.client.del(key);
+      return true;
     } catch (error) {
-      logger.warn('Cache delete error:', error.message);
+      logger.error('Cache delete error:', error.message);
+      return false;
     }
   }
 
-  async clear(pattern = '*') {
+  async clear() {
     try {
-      const client = getRedisClient();
-      const keys = await client.keys(pattern);
-      if (keys.length > 0) {
-        await client.del(keys);
-        logger.debug(`Cache CLEARED: ${keys.length} keys`);
-      }
+      await this.client.flushDb();
+      return true;
     } catch (error) {
-      logger.warn('Cache clear error:', error.message);
+      logger.error('Cache clear error:', error.message);
+      return false;
     }
   }
 
-  async getOrSet(key, fetchFn, ttl = 3600) {
+  async exists(key) {
     try {
-      const cached = await this.get(key);
-      if (cached) return cached;
-
-      const value = await fetchFn();
-      await this.set(key, value, ttl);
-      return value;
+      return (await this.client.exists(key)) === 1;
     } catch (error) {
-      logger.error('Cache getOrSet error:', error.message);
-      throw error;
+      logger.error('Cache exists error:', error.message);
+      return false;
     }
   }
 }

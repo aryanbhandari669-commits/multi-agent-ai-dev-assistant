@@ -1,6 +1,4 @@
-import logger from '../config/logger.js';
-
-export function parseJSONResponse(response) {
+export const parseJSONResponse = (response) => {
   try {
     const jsonMatch = response.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
@@ -8,47 +6,34 @@ export function parseJSONResponse(response) {
     }
     return null;
   } catch (error) {
-    logger.error('Error parsing JSON response:', error);
     return null;
   }
-}
+};
 
-export function extractCodeBlocks(response) {
-  const codeBlocks = [];
-  const regex = /```([a-z]*)\n([\s\S]*?)```/g;
+export const extractCodeBlocks = (text) => {
+  const codeBlockRegex = /```([\s\S]*?)```/g;
+  const matches = [];
   let match;
-  
-  while ((match = regex.exec(response)) !== null) {
-    codeBlocks.push({
-      language: match[1] || 'text',
-      code: match[2].trim()
+
+  while ((match = codeBlockRegex.exec(text)) !== null) {
+    matches.push({
+      code: match[1].trim(),
+      fullMatch: match[0]
     });
   }
-  
-  return codeBlocks;
-}
 
-export function extractLinks(response) {
-  const links = [];
-  const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  let match;
-  
-  while ((match = regex.exec(response)) !== null) {
-    links.push({
-      text: match[1],
-      url: match[2]
-    });
-  }
-  
-  return links;
-}
+  return matches;
+};
 
-export function cleanResponse(response) {
-  return response.trim()
-    .replace(/^\*\*.*?:\*\*\s*/gm, '')
-    .replace(/^\d+\.\s*/gm, '');
-}
+export const formatAsMarkdown = (content) => {
+  if (!content) return '';
+  return content
+    .replace(/\n/g, '\n')
+    .replace(/\*\*(.+?)\*\*/g, '**$1**')
+    .replace(/__(.*?)__/g, '__$1__');
+};
 
-export function formatCodeResponse(language, code) {
-  return `\`\`\`${language}\n${code}\n\`\`\``;
-}
+export const extractLinksFromText = (text) => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.match(urlRegex) || [];
+};
