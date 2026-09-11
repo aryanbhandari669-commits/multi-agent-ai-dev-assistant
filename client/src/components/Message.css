@@ -1,0 +1,45 @@
+.message {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.message.user {
+  background-color: rgba(30, 58, 138, 0.3);
+  border-left: 4px solid #3b82f6;
+  margin-left: 2rem;
+}
+
+.message.assistant {
+  background-color: rgba(31, 41, 55, 0.5);
+  border-left: 4px solid #a855f7;
+  margin-right: 2rem;
+}
+
+.message.loading {
+  background-color: rgba(59, 130, 246, 0.1);
+  border-left: 4px solid #3b82f6;
+}
+
+.message-content {
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+.message-metadata {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

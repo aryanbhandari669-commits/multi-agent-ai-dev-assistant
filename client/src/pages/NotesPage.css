@@ -1,0 +1,40 @@
+.notes-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #0f172a;
+  padding: 2rem;
+}
+
+.notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.notes-header h2 {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  overflow-y: auto;
+}
+
+.empty-state {
+  text-align: center;
+  color: #9ca3af;
+  padding: 3rem;
+  grid-column: 1 / -1;
+}
+
+.loading {
+  text-align: center;
+  color: #9ca3af;
+  padding: 2rem;
+  grid-column: 1 / -1;
+}

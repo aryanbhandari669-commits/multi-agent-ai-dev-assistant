@@ -1,0 +1,12 @@
+.sidebar {
+  background: linear-gradient(180deg, #1a1f35 0%, #0f172a 100%);
+  border-right: 1px solid #2d3748;
+}
+
+.sidebar-open {
+  width: 16rem;
+}
+
+.sidebar-closed {
+  width: 5rem;
+}
