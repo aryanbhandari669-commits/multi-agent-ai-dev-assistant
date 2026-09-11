@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+.message {
+  @apply mb-4 p-4 rounded-lg animate-fadeIn;
+}
+
+.message.user {
+  @apply bg-blue-900 bg-opacity-30 border-l-4 border-blue-500;
+}
+
+.message.assistant {
+  @apply bg-gray-800 bg-opacity-50 border-l-4 border-purple-500;
+}
+
+.code-block {
+  @apply bg-gray-900 rounded-lg p-4 overflow-x-auto my-3;
+}
+
+.code-block code {
+  @apply text-sm font-mono;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.spinner {
+  @apply inline-block animate-spin;
+}
+
+.badge {
+  @apply inline-block px-2 py-1 rounded-full text-xs font-semibold;
+}
+
+.badge-primary {
+  @apply bg-blue-900 bg-opacity-50 text-blue-300;
+}
+
+.badge-secondary {
+  @apply bg-purple-900 bg-opacity-50 text-purple-300;
+}
+
+.badge-success {
+  @apply bg-green-900 bg-opacity-50 text-green-300;
+}
+
+.badge-error {
+  @apply bg-red-900 bg-opacity-50 text-red-300;
+}
